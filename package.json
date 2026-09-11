@@ -12,6 +12,7 @@
   ],
   "author": "SpookyKipper, chunlaw, and contributors",
   "license": "GPL-3.0",
+  "packageManager": "pnpm@11.22.0",
   "devDependencies": {
     "cordova-android": "^15.1.0",
     "cordova-browser": "^7.0.0",
