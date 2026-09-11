@@ -14,6 +14,7 @@
   "license": "GPL-3.0",
   "packageManager": "pnpm@11.22.0",
   "devDependencies": {
+    "cordova": "^12.0.0",
     "cordova-android": "^15.1.0",
     "cordova-browser": "^7.0.0",
     "cordova-plugin-android-permissions": "^1.1.5",
