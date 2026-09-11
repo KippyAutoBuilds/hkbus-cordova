@@ -1,0 +1,68 @@
+name: Build Cordova Android APK (Release)
+on:
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout main repo and submodules
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+                  ref: "main"
+                  fetch-depth: 0 # fetch full history for checking commits in submodule
+
+            - name: Copy required files
+              run: |
+                  git submodule add -f -b gh-pages https://github.com/hkbus/hk-independent-bus-eta/ www 
+                  cp -R assets/additionals/ www/
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - name: Install required packages
+              run: |
+                  pnpm install
+                  pnpm exec cordova platform add android
+
+            - name: Decode signing keystore
+              env:
+                  KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+              run: echo "$KEYSTORE_B64" | base64 -d > release-keystore.pkcs12
+
+            - name: Generate build.json with signing config
+              env:
+                  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+                  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+              run: |
+                  cat > build.json <<EOF
+                  {
+                    "android": {
+                      "release": {
+                        "keystore": "release-keystore.pkcs12",
+                        "storePassword": "${KEYSTORE_PASSWORD}",
+                        "alias": "${KEY_ALIAS}",
+                        "password": "${KEY_PASSWORD}",
+                        "keystoreType": "pkcs12"
+                      }
+                    }
+                  }
+                  EOF
+
+            - name: Build signed APK
+              run: pnpm exec cordova build --release android -- --packageType=apk
+
+            - name: Upload signed APK artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: HKBus-Cordova.apk
+                  path: platforms/android/app/build/outputs/apk/release/app-release.apk
