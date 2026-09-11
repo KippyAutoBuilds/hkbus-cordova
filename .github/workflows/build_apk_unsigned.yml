@@ -1,0 +1,33 @@
+name: Build Cordova Android APK (Release, unsigned)
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main repo and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: "cordova"
+          fetch-depth: 0 # fetch full history for checking commits in submodule
+
+      - name: Copy required files
+        run: |
+          git submodule add -f -b gh-pages https://github.com/SpookyKipper/hk-independent-bus-eta/ www 
+          cp -R assets/additionals/ www/
+
+      - name: Install required packages
+        run: |
+          npm install
+          npx cordova platform add android
+
+      - name: Build APK
+        run: npx cordova build --release android -- --packageType=apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HKBus-Cordova-Unsigned.apk
+          path: platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
