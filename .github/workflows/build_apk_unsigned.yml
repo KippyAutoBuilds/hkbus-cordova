@@ -15,7 +15,7 @@ jobs:
 
       - name: Copy required files
         run: |
-          git submodule add -f -b gh-pages https://github.com/SpookyKipper/hk-independent-bus-eta/ www 
+          git submodule add -f -b gh-pages https://github.com/hkbus/hk-independent-bus-eta/ www 
           cp -R assets/additionals/ www/
 
       - name: Install required packages

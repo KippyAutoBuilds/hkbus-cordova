@@ -2,16 +2,6 @@ name: Build Cordova Android APK (Debug)
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - cordova
-  workflow_run:
-    workflows: ["Build & Deploy"]
-    types: [completed]
-    branches:
-      - "main"
-      - "master"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +16,7 @@ jobs:
 
       - name: Copy required files
         run: |
-          git submodule add -f -b gh-pages https://github.com/SpookyKipper/hk-independent-bus-eta/ www 
+          git submodule add -f -b gh-pages https://github.com/hkbus/hk-independent-bus-eta/ www 
           cp -R assets/additionals/ www/
           sed -i 's/id="hk.spooky.hkbusapp"/id="hk.spooky.hkbusapp.dev"/' config.xml
           sed -i 's|<name>HKBus</name>|<name>HKBus (Dev)</name>|' config.xml
